@@ -12,6 +12,8 @@ class LiftingTab(ApplicationTab):
         self.pace_display_selection = PaceDisplaySelection()
         self.pace_display = PaceDisplayWidget()
 
+        self._initialize_tab()
+
     def _build_layout(self):
         layout = QGridLayout(self)
         layout.addWidget(self.pace_display_selection, 0, 0)
