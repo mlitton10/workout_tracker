@@ -7,6 +7,8 @@ class LiftingTab(ApplicationTab):
     def __init__(self):
         super().__init__()
 
+        self.test=test
+
         self.pace_display_selection = PaceDisplaySelection()
         self.pace_display = PaceDisplayWidget()
 
