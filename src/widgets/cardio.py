@@ -10,8 +10,11 @@ class Cardio(ApplicationTab):
 
         self.test=test
 
-        self.pace_display_selection = PaceDisplaySelection()
-        self.pace_display = PaceDisplayWidget()
+        self.pace_display_selection = DisplaySelectionWidget('Pace')
+        self.pace_display = PaceDisplayWidget(labels=['Date', 'Pace'])
+
+        self.distance_display_selection = DisplaySelectionWidget('Distance')
+        self.distance_display = PaceDisplayWidget(labels=['Date', 'Distance'])
 
         self._initialize_tab()
 
