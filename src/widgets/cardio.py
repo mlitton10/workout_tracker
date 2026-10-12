@@ -29,6 +29,8 @@ class Cardio(ApplicationTab):
         pass
 
     def _connect_signals(self):
+        self.pace_display_selection.durationSelected.connect(self.load_file_async)
+        self.distance_display_selection.durationSelected.connect(self.load_file_async)
         pass
 
     def _initialize_tab(self):
