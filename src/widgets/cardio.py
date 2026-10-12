@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QGridLayout, QMessageBox
 from src.widgets.cardio_widgets.pace_display_widget import PaceDisplayWidget, DisplaySelectionWidget
 from src.widgets.template_widgets.basic_application_tabs import ApplicationTab
+from src.workers.file_reader import LoadFileWorker
 
 
 class LiftingTab(ApplicationTab):
