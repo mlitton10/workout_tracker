@@ -37,6 +37,8 @@ class Cardio(ApplicationTab):
         self._build_layout()
         self._connect_signals()
 
+        self.load_file_async(self.pace_display_selection.current_duration(), 'Pace')
+        self.load_file_async(self.distance_display_selection.current_duration(), 'Pace')
         pass
 
     def load_file_async(self, filepath: str):
