@@ -20,8 +20,11 @@ class Cardio(ApplicationTab):
 
     def _build_layout(self):
         layout = QGridLayout(self)
-        layout.addWidget(self.pace_display_selection, 0, 0, 3,3)
-        layout.addWidget(self.pace_display, 3, 0,1,1)
+        layout.addWidget(self.pace_display, 0, 0, 3,3)
+        layout.addWidget(self.pace_display_selection, 3, 0,1,1)
+
+        layout.addWidget(self.distance_display, 0, 3, 3, 3)
+        layout.addWidget(self.distance_display_selection, 3, 3, 1, 1)
 
         pass
 
