@@ -4,8 +4,8 @@ from src.widgets.template_widgets.basic_application_tabs import ApplicationTab
 from src.workers.file_reader import LoadFileWorker
 
 
-class LiftingTab(ApplicationTab):
-    def __init__(self):
+class Cardio(ApplicationTab):
+    def __init__(self, test=True):
         super().__init__()
 
         self.test=test
