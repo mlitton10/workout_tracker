@@ -1,5 +1,5 @@
-from PyQt6.QtWidgets import QGridLayout
-from src.widgets.cardio_widgets.pace_display_widget import PaceDisplayWidget, PaceDisplaySelection
+from PyQt6.QtWidgets import QGridLayout, QMessageBox
+from src.widgets.cardio_widgets.pace_display_widget import PaceDisplayWidget, DisplaySelectionWidget
 from src.widgets.template_widgets.basic_application_tabs import ApplicationTab
 
 
