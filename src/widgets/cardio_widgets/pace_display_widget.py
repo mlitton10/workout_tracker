@@ -2,13 +2,13 @@ from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import QGridLayout
 
 from src.widgets.template_widgets.basic_app_widget import BasicAppWidget
-from src.widgets.template_widgets.basic_plot_widget import PlotWidget
+from src.widgets.template_widgets.basic_plot_widget import DEFAULT_COLOR, PlotWidget
 from src.widgets.template_widgets.input_widgets import DropdownRow
 
 
 class PaceDisplayWidget(PlotWidget):
-    def __init__(self, parent=None, width=5, height=4, dpi=100, labels=("", "")):
-        super().__init__(parent, width, height, dpi, labels=labels)
+    def __init__(self, parent=None, width=5, height=4, dpi=100, labels=("", ""), color=DEFAULT_COLOR):
+        super().__init__(parent, width, height, dpi, labels=labels, color=color)
 
 
 class DisplaySelectionWidget(BasicAppWidget):

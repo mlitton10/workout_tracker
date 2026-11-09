@@ -5,6 +5,7 @@ from src.widgets.cardio_widgets.pace_display_widget import (
     PaceDisplayWidget,
 )
 from src.widgets.template_widgets.basic_application_tabs import ApplicationTab
+from src.widgets.template_widgets.basic_plot_widget import SERIES_COLORS
 from src.workers.file_reader import LoadFileWorker
 
 
@@ -13,10 +14,11 @@ class Cardio(ApplicationTab):
         super().__init__()
 
         self.pace_display_selection = DisplaySelectionWidget('Pace')
-        self.pace_display = PaceDisplayWidget(labels=['Date', 'Pace'])
+        self.pace_display = PaceDisplayWidget(labels=['Date', 'Pace'], color=SERIES_COLORS['Pace'])
 
         self.distance_display_selection = DisplaySelectionWidget('Distance')
-        self.distance_display = PaceDisplayWidget(labels=['Date', 'Distance'])
+        self.distance_display = PaceDisplayWidget(labels=['Date', 'Distance'],
+                                                  color=SERIES_COLORS['Distance'])
 
         self._initialize_tab()
 
