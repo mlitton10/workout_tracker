@@ -1,4 +1,4 @@
-from PyQt6.QtCore import pyqtSignal, pyqtSlot, QObject
+from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot
 
 
 class Worker(QObject):
@@ -12,7 +12,7 @@ class Worker(QObject):
         try:
             result = self.do_work()
             self.finished.emit(*result)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - report any worker failure to the UI thread
             self.failed.emit(str(e))
 
     def do_work(self):
