@@ -41,6 +41,9 @@ class PlotWidget(FigureCanvas):
         self.axes.set_xlabel(labels[0])
         self.axes.set_ylabel(labels[1])
         self.axes.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+        self.no_data_text = self.axes.text(0.5, 0.5, "No data in selected range",
+                                           transform=self.axes.transAxes,
+                                           ha='center', va='center', visible=False)
 
         #ax.set_aspect('equal')
 
@@ -57,10 +60,17 @@ class PlotWidget(FigureCanvas):
 
     def update_plot(self, x, y, m, b, plotting_deltas):
         self.clear_all()
+        self.no_data_text.set_visible(len(x) == 0)
         self.scatter_plot = self.axes.scatter(x, y, color='C0')
-        self.line_of_best_fit = self.axes.plot(x, m * plotting_deltas + b, color='C0')[0]
-        self.axes.set_xlim(np.min(x) - datetime.timedelta(days=3), np.max(x)+datetime.timedelta(days=3))
-        self.axes.set_ylim(np.min(y) * 0.9, np.max(y) * 1.1)
+
+        if np.isnan(m):  # fewer than 2 points, so no fit
+            self.line_of_best_fit = self.axes.plot([], [])[0]
+        else:
+            self.line_of_best_fit = self.axes.plot(x, m * plotting_deltas + b, color='C0')[0]
+
+        if len(x) > 0:
+            self.axes.set_xlim(np.min(x) - datetime.timedelta(days=3), np.max(x)+datetime.timedelta(days=3))
+            self.axes.set_ylim(np.min(y) * 0.9, np.max(y) * 1.1)
         self.draw()
 
 

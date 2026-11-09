@@ -10,37 +10,39 @@ from src.widgets.template_widgets.generic_worker import Worker
 def convert_date_strings(date_string_array):
     return np.array([date.fromisoformat(d) for d in date_string_array])
 
+DURATION_DAYS = {
+    'week': 7,
+    'month': 30,
+    'three months': 90,
+    '6 months': 180,
+    'year': 365,
+}
+
+
 def select_for_duration(dates, duration):
-    if duration.lower() == 'week':
-        duration_int = 7
-    elif duration.lower() == 'month':
-        duration_int = 30
-    elif duration.lower() == 'three months':
-        duration_int = 90
-    elif duration.lower() == '6 months':
-        duration_int = 180
-    elif duration.lower() == 'year':
-        duration_int = 365
-    elif duration.lower() == 'all':
-        good_inds = np.arange(len(dates))
-        return good_inds
+    key = duration.lower()
+    if key == 'all':
+        return np.ones(len(dates), dtype=bool)
+    if key not in DURATION_DAYS:
+        raise ValueError(f"Unknown duration: {duration!r}")
 
-    duration_delta = timedelta(days=duration_int)
-
-    good_inds = date.today() - duration_delta < dates
-    return good_inds
+    return dates > date.today() - timedelta(days=DURATION_DAYS[key])
 
 def fit_data(dates, values):
+    """Linear fit of values vs. days-before-today. Returns NaN slope/intercept
+    when there are fewer than 2 points to fit."""
     today = date.today()
-    deltas = today - dates
-    deltas_ints = np.array([float(delta.days) for delta in deltas])
+    deltas_ints = np.array([float((today - d).days) for d in dates])
+
+    if len(deltas_ints) < 2:
+        return float('nan'), float('nan'), deltas_ints
 
     m, b = np.polyfit(deltas_ints, values, 1)
 
-    return m, b, deltas_ints
+    return float(m), float(b), deltas_ints
 
 class LoadFileWorker(Worker):
-    finished = pyqtSignal(list, list, float, float, np.ndarray)
+    finished = pyqtSignal(object, object, float, float, object)
 
     def __init__(self, filepath: str, duration, column):
         super().__init__()

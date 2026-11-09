@@ -9,10 +9,8 @@ from src.workers.file_reader import LoadFileWorker
 
 
 class Cardio(ApplicationTab):
-    def __init__(self, test=True):
+    def __init__(self):
         super().__init__()
-
-        self.test=test
 
         self.pace_display_selection = DisplaySelectionWidget('Pace')
         self.pace_display = PaceDisplayWidget(labels=['Date', 'Pace'])
@@ -42,18 +40,15 @@ class Cardio(ApplicationTab):
         self.load_file_async(self.pace_display_selection.current_duration(), 'Pace')
         self.load_file_async(self.distance_display_selection.current_duration(), 'Distance')
 
-    def load_file_async(self, duration, column, widget=None):
+    def load_file_async(self, duration, column):
         targets = {'Pace': (self.pace_display, self.pace_display_selection),
                     'Distance': (self.distance_display, self.distance_display_selection)}
 
         widget, selector = targets[column]
 
-        # If a load is already running, ignore new requests for simplicity.
-        if self.thread is not None and self.thread.isRunning():
-            return
-
+        # The selector stays disabled until its load finishes, so a plot never
+        # has two loads in flight. Loads for different plots can run in parallel.
         selector.setEnabled(False)
-        self.pace_display_selection.setEnabled(False)
         self.run_worker_async(LoadFileWorker("./src/data/test.csv", duration, column),
                                 lambda *args, w=widget: self.on_load_finished(*args, widget=w), self.on_load_failed, selector)
 

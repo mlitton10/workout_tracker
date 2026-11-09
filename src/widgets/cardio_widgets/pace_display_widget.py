@@ -14,11 +14,11 @@ class PaceDisplayWidget(PlotWidget):
 class DisplaySelectionWidget(BasicAppWidget):
     durationSelected = pyqtSignal(str, str)
     def __init__(self,data_column:str, parent=None):
-        super().__init__(parent)
+        super().__init__(parent=parent)
         self.data_column = data_column
-        self.file_drop_down = DropdownRow("Select Device: ",
+        self.file_drop_down = DropdownRow("Duration: ",
                                           ["Week", "Month", "Three Months", "6 Months", "Year", "All"],
-                                          parent)
+                                          self)
         self._initialize_widget()
 
     def _connect_signals(self):

@@ -2,8 +2,8 @@ from PyQt6.QtWidgets import QGroupBox
 
 
 class BasicAppWidget(QGroupBox):
-    def __init__(self, title=None):
-        super().__init__()
+    def __init__(self, title=None, parent=None):
+        super().__init__(parent)
         if title is not None:
             self.setTitle(title)
 

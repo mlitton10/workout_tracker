@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QThread, QThreadPool
+from PyQt6.QtCore import QThread
 from PyQt6.QtWidgets import QWidget
 
 from src.widgets.template_widgets.generic_worker import Worker
@@ -8,11 +8,7 @@ class ApplicationTab(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.thread = None
-        self.worker = None
         self._jobs = []
-
-        self.threadpool = QThreadPool()
 
     def _build_layout(self):
         raise NotImplementedError("build_layout not implemented")
@@ -24,10 +20,11 @@ class ApplicationTab(QWidget):
         raise NotImplementedError("initialize_tab not implemented")
 
     def shutdown(self):
-        """Stop both the calculation thread and the persistent Pi thread."""
-        if self.thread is not None and self.thread.isRunning():
-            self.thread.quit()
-            self.thread.wait()
+        """Stop every worker thread that's still running and wait for it to exit."""
+        for thread, _worker in list(self._jobs):
+            if thread.isRunning():
+                thread.quit()
+                thread.wait()
 
     def run_worker_async(self, worker: Worker, finished_call, failed_call, widget=None):
         thread = QThread(self)
