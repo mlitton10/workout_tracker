@@ -1,22 +1,24 @@
 from PyQt6.QtCore import pyqtSignal
-from PyQt6.QtWidgets import QVBoxLayout, QGridLayout
+from PyQt6.QtWidgets import QGridLayout
+
 from src.widgets.template_widgets.basic_app_widget import BasicAppWidget
 from src.widgets.template_widgets.basic_plot_widget import PlotWidget
 from src.widgets.template_widgets.input_widgets import DropdownRow
 
 
 class PaceDisplayWidget(PlotWidget):
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
-        super().__init__(parent, width, height, dpi)
+    def __init__(self, parent=None, width=5, height=4, dpi=100, labels=("", "")):
+        super().__init__(parent, width, height, dpi, labels=labels)
 
 
-
-class PaceDisplaySelection(BasicAppWidget):
+class DisplaySelectionWidget(BasicAppWidget):
     durationSelected = pyqtSignal(str, str)
-    def __init__(self, parent=None):
+    def __init__(self,data_column:str, parent=None):
         super().__init__(parent)
-
-        self.file_drop_down = DropdownRow("Select Device: ", ["Week", "Month", "Year", "All"], parent)
+        self.data_column = data_column
+        self.file_drop_down = DropdownRow("Select Device: ",
+                                          ["Week", "Month", "Three Months", "6 Months", "Year", "All"],
+                                          parent)
         self._initialize_widget()
 
     def _connect_signals(self):
@@ -34,9 +36,9 @@ class PaceDisplaySelection(BasicAppWidget):
         self._build_layout()
         self._connect_signals()
 
-    def _emit_selection(self, index: int):
+    def _emit_selection(self):
         duration = self.current_duration()
-        self.durationSelected.emit(duration, 'Pace')
+        self.durationSelected.emit(duration, self.data_column)
 
     def current_duration(self) -> str:
         return self.file_drop_down.current_option()

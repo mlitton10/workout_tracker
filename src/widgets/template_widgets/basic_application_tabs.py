@@ -1,7 +1,5 @@
 from PyQt6.QtCore import QThread, QThreadPool
-from PyQt6.QtWidgets import (
-    QWidget
-)
+from PyQt6.QtWidgets import QWidget
 
 from src.widgets.template_widgets.generic_worker import Worker
 
@@ -12,6 +10,7 @@ class ApplicationTab(QWidget):
 
         self.thread = None
         self.worker = None
+        self._jobs = []
 
         self.threadpool = QThreadPool()
 
@@ -31,29 +30,31 @@ class ApplicationTab(QWidget):
             self.thread.wait()
 
     def run_worker_async(self, worker: Worker, finished_call, failed_call, widget=None):
-        self.thread = QThread(self)
-        self.worker = worker
+        thread = QThread(self)
+        job = (thread, worker)
+        self._jobs.append(job)
 
-        self.worker.moveToThread(self.thread)
+        worker.moveToThread(thread)
 
-        self.thread.started.connect(self.worker.run)
-        self.worker.finished.connect(finished_call)
-        self.worker.failed.connect(failed_call)
+        thread.started.connect(worker.run)
+        worker.finished.connect(finished_call)
+        worker.failed.connect(failed_call)
 
-        self.worker.finished.connect(self.thread.quit)
-        self.worker.failed.connect(self.thread.quit)
+        worker.finished.connect(thread.quit)
+        worker.failed.connect(thread.quit)
+        worker.finished.connect(worker.deleteLater)
+        worker.failed.connect(worker.deleteLater)
 
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.worker.failed.connect(self.worker.deleteLater)
+        def cleanup():
+            self._jobs.remove(job)
+            self.on_thread_finished(widget)
 
-        self.thread.finished.connect(self.thread.deleteLater)
-        self.thread.finished.connect(lambda: self.on_thread_finished(widget))
+        thread.finished.connect(thread.deleteLater)
+        thread.finished.connect(cleanup)
 
-        self.thread.start()
+        thread.start()
 
     def on_thread_finished(self, widget=None):
-        self.thread = None
-        self.worker = None
         if widget is not None:
             widget.setEnabled(True)
 

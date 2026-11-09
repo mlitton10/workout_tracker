@@ -1,5 +1,9 @@
 from PyQt6.QtWidgets import QGridLayout, QMessageBox
-from src.widgets.cardio_widgets.pace_display_widget import PaceDisplayWidget, DisplaySelectionWidget
+
+from src.widgets.cardio_widgets.pace_display_widget import (
+    DisplaySelectionWidget,
+    PaceDisplayWidget,
+)
 from src.widgets.template_widgets.basic_application_tabs import ApplicationTab
 from src.workers.file_reader import LoadFileWorker
 
@@ -26,37 +30,38 @@ class Cardio(ApplicationTab):
         layout.addWidget(self.distance_display, 0, 3, 3, 3)
         layout.addWidget(self.distance_display_selection, 3, 3, 1, 1)
 
-        pass
 
     def _connect_signals(self):
         self.pace_display_selection.durationSelected.connect(self.load_file_async)
         self.distance_display_selection.durationSelected.connect(self.load_file_async)
-        pass
 
     def _initialize_tab(self):
         self._build_layout()
         self._connect_signals()
 
         self.load_file_async(self.pace_display_selection.current_duration(), 'Pace')
-        self.load_file_async(self.distance_display_selection.current_duration(), 'Pace')
-        pass
+        self.load_file_async(self.distance_display_selection.current_duration(), 'Distance')
 
-    def load_file_async(self, filepath: str):
+    def load_file_async(self, duration, column, widget=None):
+        targets = {'Pace': (self.pace_display, self.pace_display_selection),
+                    'Distance': (self.distance_display, self.distance_display_selection)}
+
+        widget, selector = targets[column]
+
         # If a load is already running, ignore new requests for simplicity.
         if self.thread is not None and self.thread.isRunning():
             return
 
-        self.ds.setEnabled(False)
+        selector.setEnabled(False)
+        self.pace_display_selection.setEnabled(False)
+        self.run_worker_async(LoadFileWorker("./src/data/test.csv", duration, column),
+                                lambda *args, w=widget: self.on_load_finished(*args, widget=w), self.on_load_failed, selector)
 
-        self.run_worker_async(LoadMachineWorker(filepath), self.on_load_finished, self.on_load_failed, self.ds)
 
-    def on_load_finished(self, filepath: str, length: float, radius: float):
-        self.canvas.update_machine_radial_outline(radius)
-
-    #		self.status_label.setText(f"Loaded {os.path.basename(filepath)}")
+    def on_load_finished(self, x, y, m, b, plotting_deltas, widget=None):
+        widget.update_plot(x, y, m, b, plotting_deltas)
 
     def on_load_failed(self, message: str):
-        #		self.status_label.setText("Load failed")
         QMessageBox.critical(self, "Load Error", message)
 
 

@@ -1,7 +1,11 @@
-from PyQt6.QtWidgets import QSizePolicy
+import datetime
+
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
+from PyQt6.QtWidgets import QSizePolicy
 
 rc_dict = {"figure.autolayout": True, "font.family": 'serif', 'font.size': 18.0,
 		   'lines.linewidth': 2.5, 'axes.titlepad':8.0,
@@ -16,7 +20,7 @@ plt.rcParams.update(rc_dict)
 
 class PlotWidget(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
+    def __init__(self, parent=None, width=5, height=4, dpi=100, labels=("", "")):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = self.fig.add_subplot(111)
 
@@ -26,4 +30,37 @@ class PlotWidget(FigureCanvas):
                                    QSizePolicy.Policy.Expanding,
                                    QSizePolicy.Policy.Expanding)
         FigureCanvas.updateGeometry(self)
+
+        self._initialize_canvas(labels)
+
+
+    def _initialize_canvas(self, labels):
+
+        self.scatter_plot = self.axes.scatter([], [], alpha=0)
+        self.line_of_best_fit = self.axes.plot([],[], alpha=0)[0]
+        self.axes.set_xlabel(labels[0])
+        self.axes.set_ylabel(labels[1])
+        self.axes.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+
+        #ax.set_aspect('equal')
+
+
+    def clear_line_of_best_fit(self):
+        self.line_of_best_fit.remove()
+
+    def clear_scatter(self):
+        self.scatter_plot.remove()
+
+    def clear_all(self):
+        self.clear_line_of_best_fit()
+        self.clear_scatter()
+
+    def update_plot(self, x, y, m, b, plotting_deltas):
+        self.clear_all()
+        self.scatter_plot = self.axes.scatter(x, y, color='C0')
+        self.line_of_best_fit = self.axes.plot(x, m * plotting_deltas + b, color='C0')[0]
+        self.axes.set_xlim(np.min(x) - datetime.timedelta(days=3), np.max(x)+datetime.timedelta(days=3))
+        self.axes.set_ylim(np.min(y) * 0.9, np.max(y) * 1.1)
+        self.draw()
+
 
