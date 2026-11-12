@@ -1,6 +1,8 @@
 from PyQt6.QtCore import QThread
-from PyQt6.QtWidgets import QWidget
+from PyQt6.QtWidgets import QDialog, QMessageBox, QWidget
 
+from src.utils.csv_store import append_record
+from src.widgets.template_widgets.data_entry_dialog import DataEntryDialog
 from src.widgets.template_widgets.generic_worker import Worker
 
 
@@ -18,6 +20,23 @@ class ApplicationTab(QWidget):
 
     def _initialize_tab(self):
         raise NotImplementedError("initialize_tab not implemented")
+
+    def refresh(self):
+        """Reload the tab's displays after its data has changed."""
+        raise NotImplementedError("refresh not implemented")
+
+    def open_entry_dialog(self, dialog: DataEntryDialog, filepath: str, columns: list[str]) -> bool:
+        """Show a data-entry popup; if accepted, append its record and refresh.
+        Returns True if a record was saved."""
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return False
+        try:
+            append_record(filepath, columns, dialog.get_record())
+        except OSError as e:
+            QMessageBox.critical(self, "Save Error", f"Could not save to {filepath}:\n{e}")
+            return False
+        self.refresh()
+        return True
 
     def shutdown(self):
         """Stop every worker thread that's still running and wait for it to exit."""

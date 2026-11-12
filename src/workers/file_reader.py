@@ -1,3 +1,4 @@
+import os
 from datetime import date, timedelta
 
 import numpy as np
@@ -8,7 +9,7 @@ from src.widgets.template_widgets.generic_worker import Worker
 
 
 def convert_date_strings(date_string_array):
-    return np.array([date.fromisoformat(d) for d in date_string_array])
+    return np.array([date.fromisoformat(d) for d in date_string_array], dtype=object)
 
 DURATION_DAYS = {
     'week': 7,
@@ -65,8 +66,12 @@ class LoadFileWorker(Worker):
         return good_dates, good_values, m, b, plotting_deltas
 
     def load_csv_data(self, filepath: str, column):
+        # No file yet (nothing logged) means no data, not an error.
+        if not os.path.exists(filepath) or os.path.getsize(filepath) == 0:
+            return [], np.array([], dtype=float)
 
-        dataframe = pd.read_csv(filepath)
+        # Sort so backdated entries plot in order.
+        dataframe = pd.read_csv(filepath).sort_values('Date', kind='stable')
 
         date_strings = dataframe['Date'].to_list()
         values = dataframe[column].to_numpy()
